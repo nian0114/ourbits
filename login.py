@@ -6,6 +6,9 @@ def login():
     with requests.Session() as s:
         r = s.post(ourBitsUrl+"takelogin.php", data={'username': username, 'password': password})
         print(r.headers)
-        t = s.get(ourBitsUrl+"torrents.php")
-        print(t.text)
-        print(t.headers)   
+        return s
+
+s=login()
+t = s.get(ourBitsUrl+"torrents.php")
+print(t.text)
+print(t.headers)
