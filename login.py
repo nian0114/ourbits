@@ -12,7 +12,7 @@ def login():
 def getFreeTorrent(t,class_name):
     soup = BeautifulSoup(t.text, 'html.parser')
     soup_result = soup.find_all(class_=class_name)
-    
+
     return soup_result
 
 s=login()
