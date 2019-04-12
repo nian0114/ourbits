@@ -18,21 +18,22 @@ def getFreeTorrent(t,class_name):
 
 def getInfo(td):
     soup_result_td = tr.find_all("td")        
-    download_id = re.match(r'.*?details.php\?id\=(\d+)(.*)',str(soup_result_td[10])).group(1)
-    seeder = soup_result_td[10].text
+    download_id = re.match(r'.*?details.php\?id\=(\d+)(.*)',str(soup_result_td)).group(1)
+    size = soup_result_td[9].text
+    seeder = soup_result_td[11].text
     
-    return download_id , seeder
+    return download_id, size, seeder
 
 s=login()
 t = s.get(ourBitsUrl+"torrents.php")
 
 for tr in getFreeTorrent(t,"sticky_top"):
-    if 'Free' in str(tr.contents[3]):
-        download_id,seeder=getInfo(tr)
+    if 'Free' in str(tr.contents[3]) and 'hitandrun' not in str(tr.contents[3]):
+        download_id, size, seeder=getInfo(tr)
         download_link = "https://ourbits.club/download.php?id=" + download_id + "&passkey=" + passkey + "&https=0"
         print(tr)
 
 for tr in getFreeTorrent(t,"sticky_normal"):
-    if 'Free' in str(tr.contents[3]):
-        download_id,seeder=getInfo(tr)
+    if 'Free' in str(tr.contents[3]) and 'hitandrun' not in str(tr.contents[3]):
+        download_id, size, seeder=getInfo(tr)
         download_link = "https://ourbits.club/download.php?id=" + download_id + "&passkey=" + passkey + "&https=0"        
