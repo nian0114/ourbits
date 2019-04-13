@@ -3,6 +3,14 @@ import requests
 import re
 from config import *
 from bs4 import BeautifulSoup
+def getSize(num):
+    real_num = float(re.findall("\d+\.?\d*",num)[0])
+    if 'GB' in num:
+        return real_num*1024*1024*1024
+    elif 'MB' in num:
+        return real_num*1024*1024
+    elif 'TB' in num:
+        return real_num*1024*1024*1024*1024
 
 def login():
     with requests.Session() as s:
@@ -19,7 +27,7 @@ def getFreeTorrent(t,class_name):
 def getInfo(td):
     soup_result_td = tr.find_all("td")        
     download_id = re.match(r'.*?details.php\?id\=(\d+)(.*)',str(soup_result_td)).group(1)
-    size = soup_result_td[9].text
+    size = getSize(soup_result_td[9].text)
     seeder = soup_result_td[11].text
     
     return download_id, size, seeder
