@@ -44,4 +44,4 @@ for tr in getFreeTorrent(t,"sticky_top"):
 for tr in getFreeTorrent(t,"sticky_normal"):
     if 'Free' in str(tr.contents[3]) and 'hitandrun' not in str(tr.contents[3]):
         download_id, size, seeder=getInfo(tr)
-        download_link = "https://ourbits.club/download.php?id=" + download_id + "&passkey=" + passkey + "&https=0"        
+        download_link = "https://ourbits.club/download.php?id=" + download_id + "&passkey=" + passkey + "&https=0"
