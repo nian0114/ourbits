@@ -4,10 +4,22 @@ import re
 from config import *
 from bs4 import BeautifulSoup
 from pymongo import MongoClient
+from qbittorrent import Client
 
 conn = MongoClient(mongo_ip, mongo_port)
 db = conn.pt_site
 my_set = db.ourbits
+
+qb = Client(system_url)
+qb.login()
+
+def delete_permanently_files(infohash):
+    r = requests.get(system_url + '/api/v2/torrents/delete?hashes=' + infohash + '&deleteFiles=false')
+    
+def get_files(status):
+    r = requests.get(system_url + '/api/v2/torrents/info?filter='+status+'sort=ratio')
+    datas = json.loads(r.text)
+    return datas
 
 def getSize(num):
     real_num = float(re.findall("\d+\.?\d*",num)[0])
@@ -46,8 +58,12 @@ for tr in getFreeTorrent(t,"sticky_top"):
         download_id, size, seeder=getInfo(tr)
         download_link = "https://ourbits.club/download.php?id=" + download_id + "&passkey=" + passkey + "&https=0"
         result = my_set.find_one({"id":download_id})
+        link_list = [download_link]
         if result is None:
-            my_set.insert_one({"id":download_id,"href":download_link,"size":size,"seeder":seeder,"top":1,"deal":0})       
+            qb.download_from_link(link_list)            
+            my_set.insert_one({"id":download_id,"href":download_link,"size":size,"seeder":seeder,"top":1,"deal":0})
+        else:
+            my_set.update_one({"id":download_id},{"$set":{"seeder":seeder}})
 
 for tr in getFreeTorrent(t,"sticky_normal"):
     if 'Free' in str(tr.contents[3]) and 'hitandrun' not in str(tr.contents[3]):
@@ -55,4 +71,6 @@ for tr in getFreeTorrent(t,"sticky_normal"):
         download_link = "https://ourbits.club/download.php?id=" + download_id + "&passkey=" + passkey + "&https=0"
         result = my_set.find_one({"id":download_id})
         if result is None:
-            my_set.insert_one({"id":download_id,"href":download_link,"size":size,"seeder":seeder,"top":0,"deal":0})      
+            my_set.insert_one({"id":download_id,"href":download_link,"size":size,"seeder":seeder,"top":0,"deal":0}) 
+        else:
+            my_set.update_one({"id":download_id},{"$set":{"seeder":seeder}})            
