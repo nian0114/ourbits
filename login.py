@@ -69,8 +69,11 @@ for tr in getFreeTorrent(t,"sticky_normal"):
     if 'Free' in str(tr.contents[3]) and 'hitandrun' not in str(tr.contents[3]):
         download_id, size, seeder=getInfo(tr)
         download_link = "https://ourbits.club/download.php?id=" + download_id + "&passkey=" + passkey + "&https=0"
+        link_list = [download_link]
         result = my_set.find_one({"id":download_id})
         if result is None:
+            if len(qb.torrents(filter='downloading')) == 0:
+                qb.download_from_link(link_list)                
             my_set.insert_one({"id":download_id,"href":download_link,"size":size,"seeder":seeder,"top":0,"deal":0}) 
         else:
             my_set.update_one({"id":download_id},{"$set":{"seeder":seeder}})            
