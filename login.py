@@ -3,6 +3,12 @@ import requests
 import re
 from config import *
 from bs4 import BeautifulSoup
+from pymongo import MongoClient
+
+conn = MongoClient(mongo_ip, mongo_port)
+db = conn.pt_site
+my_set = db.ourbits
+
 def getSize(num):
     real_num = float(re.findall("\d+\.?\d*",num)[0])
     if 'GB' in num:
@@ -39,9 +45,14 @@ for tr in getFreeTorrent(t,"sticky_top"):
     if 'Free' in str(tr.contents[3]) and 'hitandrun' not in str(tr.contents[3]):
         download_id, size, seeder=getInfo(tr)
         download_link = "https://ourbits.club/download.php?id=" + download_id + "&passkey=" + passkey + "&https=0"
-        print(tr)
+        result = my_set.find_one({"id":download_id})
+        if result is None:
+            my_set.insert_one({"id":download_id,"href":download_link,"size":size,"seeder":seeder,"top":1,"deal":0})       
 
 for tr in getFreeTorrent(t,"sticky_normal"):
     if 'Free' in str(tr.contents[3]) and 'hitandrun' not in str(tr.contents[3]):
         download_id, size, seeder=getInfo(tr)
         download_link = "https://ourbits.club/download.php?id=" + download_id + "&passkey=" + passkey + "&https=0"
+        result = my_set.find_one({"id":download_id})
+        if result is None:
+            my_set.insert_one({"id":download_id,"href":download_link,"size":size,"seeder":seeder,"top":0,"deal":0})      
