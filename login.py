@@ -13,6 +13,7 @@ my_set = db.ourbits
 qb = Client(system_url)
 qb.login()
 
+jar = requests.cookies.RequestsCookieJar()
 def delete_permanently_files(infohash):
     r = requests.get(system_url + '/api/v2/torrents/delete?hashes=' + infohash + '&deleteFiles=false')
     
@@ -31,10 +32,9 @@ def getSize(num):
         return real_num*1024*1024*1024*1024
 
 def login():
-    with requests.Session() as s:
-        r = s.post(ourBitsUrl+"takelogin.php", data={'username': username, 'password': password})
-        print(r.headers)
-        return s
+    r = requests.get(ourBitsUrl+"torrents.php",cookies=jar)
+    print(r.headers)
+    return r
 
 def getFreeTorrent(t,class_name):
     soup = BeautifulSoup(t.text, 'html.parser')
@@ -50,8 +50,7 @@ def getInfo(td):
     
     return download_id, size, seeder
 
-s=login()
-t = s.get(ourBitsUrl+"torrents.php")
+t=login()
 
 for tr in getFreeTorrent(t,"sticky_top"):
     if 'Free' in str(tr.contents[3]) and 'hitandrun' not in str(tr.contents[3]):
