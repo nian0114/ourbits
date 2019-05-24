@@ -71,7 +71,7 @@ for tr in getFreeTorrent(t,"sticky_normal"):
         link_list = [download_link]
         result = my_set.find_one({"id":download_id})
         if result is None:
-            if len(qb.torrents(filter='downloading')) == 0:
+            if len(qb.torrents(filter='downloading')) < 2:
                 qb.download_from_link(link_list)                
             my_set.insert_one({"id":download_id,"href":download_link,"size":size,"seeder":seeder,"top":0,"deal":0}) 
         else:
