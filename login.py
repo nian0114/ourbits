@@ -11,7 +11,7 @@ db = conn.pt_site
 my_set = db.ourbits
 
 qb = Client(system_url)
-qb.login()
+qb.login(username,password)
 
 jar = requests.cookies.RequestsCookieJar()
 def delete_permanently_files(infohash):
